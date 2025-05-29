@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-const API_KEY = "";
+const API_KEY = process.env.REACT_APP_API_KEY 
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 
@@ -67,21 +67,28 @@ const formatCurrentWeather = (data) => {
 
 const formatForecastWeather = (data) => {
     let { timezone, daily, hourly } = data;
-    daily = daily.slice(1, 6).map(d => {
-        return {
-            title: formatToLocalTime(d.dt, timezone, 'ccc'),
-            temp: d.temp.day,
-            icon: d.weather[0].icon
-        }
-    })
-
-    hourly = hourly.slice(1, 6).map(d => {
-        return {
-            title: formatToLocalTime(d.dt, timezone, 'hh:mm a'),
-            temp: d.temp,
-            icon: d.weather[0].icon
-        }
-    })
+    
+    // Check if daily exists and is an array
+    daily = daily && Array.isArray(daily) 
+        ? daily.slice(1, 6).map(d => {
+            return {
+                title: formatToLocalTime(d.dt, timezone, 'ccc'),
+                temp: d.temp.day,
+                icon: d.weather[0].icon
+            }
+        })
+        : []; // Return empty array if daily is undefined
+    
+    // Check if hourly exists and is an array
+    hourly = hourly && Array.isArray(hourly)
+        ? hourly.slice(1, 6).map(d => {
+            return {
+                title: formatToLocalTime(d.dt, timezone, 'hh:mm a'),
+                temp: d.temp,
+                icon: d.weather[0].icon
+            }
+        })
+        : []; // Return empty array if hourly is undefined
 
     return { timezone, daily, hourly };
 }
